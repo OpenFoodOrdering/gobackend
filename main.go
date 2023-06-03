@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/OpenFoodOrdering/gobackend/db"
 	"github.com/go-chi/chi"
 	"github.com/urfave/cli/v2"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var MongoDb mongo.Client
@@ -27,14 +27,8 @@ func run(cCtx *cli.Context) error {
 	// New CHI Router
 	r := chi.NewRouter()
 
-	ServerAPI := options.ServerAPI(options.ServerAPIVersion1)
-	ClientOptions := options.Client().ApplyURI(cCtx.String("mongodb_url")).SetServerAPIOptions(ServerAPI)
-
-	// Initialize MongoDb Client Connection Pool Using ClientOptions
-	MongoDb, err := mongo.NewClient(ClientOptions)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// Initialize MongoDb
+	db.Init(cCtx.String("mongodb_url"))
 
 	// Get Port
 	port := fmt.Sprint(":", cCtx.Int("port"))
