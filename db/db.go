@@ -1,10 +1,13 @@
 package db
 
 import (
+	"context"
 	"log"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 var MongoDb mongo.Client
@@ -20,4 +23,16 @@ func Init(url string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	ctx, cancelfunc := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancelfunc()
+	// Ping MongoDb
+	err = MongoDb.Ping(ctx, &readpref.ReadPref{})
+	if err != nil {
+		log.Fatal("Unable to Connect to Mongo Db:", err)
+	}
+}
+
+func GetClient() *mongo.Client {
+	return &MongoDb
 }

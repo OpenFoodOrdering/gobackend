@@ -7,12 +7,11 @@ import (
 	"os"
 
 	"github.com/OpenFoodOrdering/gobackend/db"
+	"github.com/OpenFoodOrdering/gobackend/data"
 	"github.com/go-chi/chi"
 	"github.com/urfave/cli/v2"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var MongoDb mongo.Client
 
 func main() {
 	app := app()
@@ -32,6 +31,11 @@ func run(cCtx *cli.Context) error {
 
 	// Get Port
 	port := fmt.Sprint(":", cCtx.Int("port"))
+	
+
+	// Get Specific Item
+	r.Get("/menus/{id}", data.GetOneMenu)
+
 
 	// Serve Using Router
 	http.ListenAndServe(port, r)
