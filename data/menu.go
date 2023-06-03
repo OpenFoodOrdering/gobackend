@@ -60,3 +60,50 @@ func GetOneMenu(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
 }
+
+// Get All Menus
+func GetMenus(w http.ResponseWriter, r *http.Request) {
+	// Get A Context
+	ctx, cancelfunc := context.WithTimeout(r.Context(), 10*time.Second)
+	defer cancelfunc()
+
+	// Set Request Header to Application JSON
+	w.Header().Set("Content-Type", "application/json")
+
+	// Get Menu Collection
+	collection := db.GetClient().Database("openfoodordering").Collection("menus")
+
+	var results []Menu
+
+	// Find All Documents in Menu Collection
+	cursor, err := collection.Find(ctx, nil)
+
+	if err != mongo.ErrNoDocuments {
+		w.WriteHeader(http.StatusNoContent)
+		json.NewEncoder(w).Encode(results)
+		return
+	}
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err)
+		return
+	}
+
+	// Put Cursor Into Results
+	err = cursor.All(ctx, results)
+
+	if err != mongo.ErrNoDocuments {
+		w.WriteHeader(http.StatusNoContent)
+		json.NewEncoder(w).Encode(results)
+		return
+	}
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(results)
+
+}
