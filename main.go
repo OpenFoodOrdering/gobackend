@@ -6,12 +6,11 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/OpenFoodOrdering/gobackend/db"
 	"github.com/OpenFoodOrdering/gobackend/data"
+	"github.com/OpenFoodOrdering/gobackend/db"
 	"github.com/go-chi/chi"
 	"github.com/urfave/cli/v2"
 )
-
 
 func main() {
 	app := app()
@@ -31,11 +30,12 @@ func run(cCtx *cli.Context) error {
 
 	// Get Port
 	port := fmt.Sprint(":", cCtx.Int("port"))
-	
 
 	// Get Specific Item
 	r.Get("/menus/{id}", data.GetOneMenu)
 
+	// Get All Menus
+	r.Get("/menus/", data.GetMenus)
 
 	// Serve Using Router
 	http.ListenAndServe(port, r)
